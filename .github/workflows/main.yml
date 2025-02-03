@@ -1,0 +1,47 @@
+name: Maven Build and Execute Goals
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'adoptopenjdk'
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Build the Maven Project
+      run: mvn clean install
+
+    - name: Display Maven Goals Output
+      run: |
+        echo "Executing Maven Goals:"
+        mvn validate
+        mvn compile
+        mvn test
+        mvn package
+        mvn verify
+        mvn install
+        mvn deploy
+        mvn site
+        mvn clean
